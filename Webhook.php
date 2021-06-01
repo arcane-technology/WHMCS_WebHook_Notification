@@ -78,12 +78,13 @@ class Webhook implements NotificationModuleInterface
     public function settings()
     {
         return [
-           'webhookenabled' => [
-               'FriendlyName' => 'Enable WebHook Notifications',
-               'Type' => 'yesno',
-               'Description' => '',
-	       'Default' => 1
-           ]
+            'dataformat' => [
+                'FriendlyName' => 'Data Format',
+                'Type' => 'dropdown',
+                'Description' => 'Format in which to send the data to the endpoints',
+                'Options' => array('JSON'),
+                'Default' => 'JSON'
+            ]
         ];
     }
 
@@ -105,11 +106,7 @@ class Webhook implements NotificationModuleInterface
      */
     public function testConnection($settings)
     {
-	    if ($settings]['webhookenabled'] == false) {
-		    return false;
-	    } else {
-		    return true;
-	    }
+        return true;
     }
 
     /**
@@ -210,7 +207,6 @@ class Webhook implements NotificationModuleInterface
             throw new Exception('No endpoint Found');
         }
         $mergeFields = [
-            'to' => $to,
             'event_title' => $notification->getTitle(),
             'event_url' => $notification->getUrl(),
             'event_message' => $notification->getMessage(),
@@ -219,36 +215,30 @@ class Webhook implements NotificationModuleInterface
 
         foreach ($notification->getAttributes() as $attribute) {
             $mergeFields['event_params'][] = [
-                'label' => $attribute->getLabel(),
-                'value' => $attribute->getValue(),
-                'url' => $attribute->getUrl(),
-                'style' => $attribute->getStyle(),
-                'icon' => $attribute->getIcon(),
+                $attribute->getLabel() => $attribute->getValue()
             ];
         }
 
-	$curl = curl_init();
+        $curl = curl_init();
 
-	$jsonArgs = json_encode($mergeFields);
-	
-	curl_setopt_array($curl, [
-	    CURLOPT_URL => $url,
-	    CURLOPT_POST => true,
-	    CURLOPT_FOLLOWLOCATION => true,
-	    CURLOPT_SSL_VERIFYHOST => false,
-	    CURLOPT_HTTPHEADER => array('Content-Type:application/json'),
-	    CURLOPT_RETURNTRANSFER => true,
-	    CURLOPT_POSTFIELDS => $jsonArgs
-	]);
-	
-	$response = curl_exec($curl);
-	$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-	
-	curl_close($curl);
-	$response = json_decode($response, true);
+        $jsonArgs = json_encode($mergeFields);
 
-	logModuleCall('webhook', $url, $jsonArgs, "HTTP Code: " . $httpCode . "\n" . $response);
-	
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $url,
+            CURLOPT_POST => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HTTPHEADER => array('Content-Type:application/json'),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POSTFIELDS => $jsonArgs
+        ]);
 
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+        $response = json_decode($response, true);
+
+        logModuleCall('webhook', $url, $jsonArgs, "HTTP Code: " . $httpCode . "\n" . $response);
     }
 }

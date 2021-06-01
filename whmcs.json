@@ -1,0 +1,28 @@
+{
+  "schema": "1.0",
+  "type": "whmcs-notifications",
+  "name": "webhook",
+  "license": "proprietary",
+  "category": "notifications",
+  "description": {
+    "name": "WebHook",
+    "tagline": "Configure rule based notifications delivered via webhook.",
+    "long": "Setup advanced rule based notifications for events and triggers that matter to you and receive those notifications to a webhook endpoint.",
+    "features": [
+      "Setup rule based events and triggers",
+      "Receive notifications via web hook url"
+    ]
+  },
+  "logo": {
+    "filename": "logo.png"
+  },
+  "support": {
+    "docs_url": "https:\/\/docs.whmcs.com\/Notifications"
+  },
+  "authors": [
+    {
+      "name": "Arcane Technology Solutions, LLC",
+      "homepage": "https:\/\/www.arcanetechsolutions.com\/"
+    }
+  ]
+}
